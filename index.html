@@ -1,0 +1,2626 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ระบบเบิก-จ่ายพัสดุ ครุภัณฑ์ รพ.สต.บ้านทับสอ</title>
+  <style>
+    :root {
+      --ink: #13232f;
+      --muted: #647783;
+      --line: #d9e5e8;
+      --paper: #f7fbfb;
+      --panel: #ffffff;
+      --teal: #0f8f8c;
+      --teal-dark: #08716e;
+      --blue: #2563eb;
+      --green: #148a55;
+      --amber: #b7791f;
+      --red: #d64545;
+      --shadow: 0 18px 45px rgba(19, 35, 47, 0.08);
+      --radius: 8px;
+      font-family: "Noto Sans Thai", "Tahoma", system-ui, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background:
+        linear-gradient(135deg, rgba(15, 143, 140, 0.08), transparent 34%),
+        linear-gradient(315deg, rgba(37, 99, 235, 0.08), transparent 30%),
+        var(--paper);
+      color: var(--ink);
+      min-height: 100vh;
+    }
+
+    button,
+    input,
+    select,
+    textarea {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .app {
+      display: grid;
+      grid-template-columns: 272px minmax(0, 1fr);
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      background: #0c3033;
+      color: #effafa;
+      padding: 20px 16px;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+      border-right: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .brand {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .brand-mark {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(145deg, #12a19c, #28b878);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+    }
+
+    .brand h1 {
+      font-size: 18px;
+      line-height: 1.25;
+      margin: 0;
+      letter-spacing: 0;
+    }
+
+    .brand span {
+      color: #b6dfe2;
+      font-size: 12px;
+      display: block;
+      margin-top: 2px;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav-btn {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 22px 1fr auto;
+      align-items: center;
+      gap: 10px;
+      border: 0;
+      background: transparent;
+      color: #d8eeee;
+      padding: 10px 12px;
+      border-radius: 8px;
+      text-align: left;
+      transition: background 0.18s ease, color 0.18s ease;
+    }
+
+    .nav-btn:hover,
+    .nav-btn.active {
+      background: rgba(255, 255, 255, 0.12);
+      color: #ffffff;
+    }
+
+    .nav-btn svg,
+    .icon {
+      width: 20px;
+      height: 20px;
+      stroke-width: 2;
+      flex: 0 0 auto;
+    }
+
+    .nav-badge {
+      min-width: 24px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      display: grid;
+      place-items: center;
+      font-size: 12px;
+      color: #073436;
+      background: #b7f0da;
+    }
+
+    .content {
+      padding: 18px 22px 32px;
+      min-width: 0;
+    }
+
+    .topbar {
+      min-height: 72px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .top-title h2 {
+      margin: 0;
+      font-size: clamp(22px, 3vw, 32px);
+      letter-spacing: 0;
+      line-height: 1.2;
+    }
+
+    .top-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .connection {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--line);
+      background: var(--panel);
+      color: var(--muted);
+      border-radius: 999px;
+      padding: 8px 12px;
+      min-height: 38px;
+      box-shadow: 0 8px 20px rgba(19, 35, 47, 0.04);
+      font-size: 13px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--amber);
+    }
+
+    .dot.online {
+      background: var(--green);
+    }
+
+    .dot.offline {
+      background: var(--red);
+    }
+
+    .btn,
+    .icon-btn {
+      border: 1px solid transparent;
+      border-radius: 8px;
+      min-height: 40px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--teal);
+      color: white;
+      padding: 9px 14px;
+      box-shadow: 0 8px 18px rgba(15, 143, 140, 0.18);
+      transition: transform 0.15s ease, background 0.15s ease, border 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:hover,
+    .icon-btn:hover {
+      background: var(--teal-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary,
+    .icon-btn.secondary {
+      color: var(--ink);
+      background: #fff;
+      border-color: var(--line);
+      box-shadow: none;
+    }
+
+    .btn.danger {
+      background: var(--red);
+    }
+
+    .icon-btn {
+      width: 40px;
+      padding: 0;
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(132px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+      min-width: 0;
+    }
+
+    .metric {
+      min-height: 112px;
+      display: grid;
+      gap: 6px;
+      align-content: space-between;
+    }
+
+    .metric .label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .metric strong {
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .metric small {
+      color: var(--muted);
+    }
+
+    .dashboard-layout {
+      display: grid;
+      grid-template-columns: 1.3fr 0.9fr;
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      min-width: 0;
+    }
+
+    .panel-head {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .panel-head h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.2;
+    }
+
+    .panel-body {
+      padding: 16px;
+      min-width: 0;
+    }
+
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(160px, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .quick-actions .btn {
+      min-height: 52px;
+      justify-content: flex-start;
+      color: var(--ink);
+      background: #fff;
+      border-color: var(--line);
+      box-shadow: 0 8px 20px rgba(19, 35, 47, 0.05);
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .searchbar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: min(100%, 340px);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      padding: 0 12px;
+      min-height: 42px;
+    }
+
+    .searchbar input {
+      border: 0;
+      outline: 0;
+      width: 100%;
+      min-width: 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-width: 100%;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 820px;
+    }
+
+    th,
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    th {
+      color: var(--muted);
+      font-weight: 700;
+      background: #f3f8f9;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    td.actions {
+      width: 1%;
+      white-space: nowrap;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 999px;
+      min-height: 26px;
+      padding: 3px 9px;
+      background: #eaf6f5;
+      color: var(--teal-dark);
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.warn {
+      background: #fff4db;
+      color: #966300;
+    }
+
+    .status.danger {
+      background: #ffe7e7;
+      color: #b83232;
+    }
+
+    .status.ok {
+      background: #e5f7ed;
+      color: #137348;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 12px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+      grid-column: span 4;
+      min-width: 0;
+    }
+
+    .field.span-2 {
+      grid-column: span 2;
+    }
+
+    .field.span-3 {
+      grid-column: span 3;
+    }
+
+    .field.span-6 {
+      grid-column: span 6;
+    }
+
+    .field.span-8 {
+      grid-column: span 8;
+    }
+
+    .field.span-12 {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      color: var(--ink);
+      min-height: 42px;
+      padding: 9px 11px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 88px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(15, 143, 140, 0.12);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .split {
+      display: grid;
+      grid-template-columns: minmax(0, 0.9fr) minmax(420px, 1.1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .chart {
+      min-height: 240px;
+      display: grid;
+      align-items: end;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 7px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px 12px 12px;
+      background: linear-gradient(180deg, #fbfefe, #f5fafb);
+    }
+
+    .bar {
+      display: grid;
+      align-items: end;
+      gap: 6px;
+      height: 100%;
+      min-width: 0;
+    }
+
+    .bar span {
+      border-radius: 5px 5px 0 0;
+      background: linear-gradient(180deg, #1ea6a1, #2463eb);
+      min-height: 3px;
+    }
+
+    .bar small {
+      text-align: center;
+      color: var(--muted);
+      font-size: 11px;
+      overflow-wrap: anywhere;
+    }
+
+    .donut-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .donut {
+      width: 180px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: conic-gradient(#0f8f8c 0 40%, #2563eb 40% 70%, #b7791f 70% 88%, #d64545 88% 100%);
+      position: relative;
+    }
+
+    .donut::after {
+      content: "";
+      position: absolute;
+      inset: 30px;
+      border-radius: 50%;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .legend {
+      display: grid;
+      gap: 8px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .legend-color {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+      margin-right: 8px;
+    }
+
+    .empty {
+      padding: 28px;
+      text-align: center;
+      color: var(--muted);
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      background: #fbfefe;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      display: grid;
+      gap: 8px;
+      z-index: 40;
+    }
+
+    .toast-item {
+      background: #102d31;
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+      max-width: min(420px, calc(100vw - 36px));
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(11, 30, 34, 0.48);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      z-index: 30;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal {
+      width: min(960px, 100%);
+      max-height: min(88vh, 900px);
+      overflow: auto;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+      border: 1px solid var(--line);
+    }
+
+    .qr-box {
+      display: grid;
+      place-items: center;
+      width: 116px;
+      aspect-ratio: 1;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    .settings-box {
+      display: grid;
+      gap: 12px;
+      max-width: 760px;
+    }
+
+    .hint {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    @media (max-width: 1180px) {
+      .cards {
+        grid-template-columns: repeat(3, minmax(160px, 1fr));
+      }
+
+      .dashboard-layout,
+      .split {
+        grid-template-columns: 1fr;
+      }
+
+      .quick-actions {
+        grid-template-columns: repeat(2, minmax(160px, 1fr));
+      }
+    }
+
+    @media (max-width: 820px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        padding: 14px;
+      }
+
+      .nav-group {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .nav-btn {
+        grid-template-columns: 22px 1fr;
+      }
+
+      .nav-badge {
+        display: none;
+      }
+
+      .content {
+        padding: 14px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .top-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+
+      .cards,
+      .quick-actions {
+        grid-template-columns: 1fr;
+      }
+
+      .field,
+      .field.span-2,
+      .field.span-3,
+      .field.span-6,
+      .field.span-8 {
+        grid-column: 1 / -1;
+      }
+
+      .donut-row {
+        grid-template-columns: 1fr;
+        justify-items: center;
+      }
+    }
+
+    @media print {
+      .sidebar,
+      .top-actions,
+      .toolbar,
+      .form-actions,
+      .btn,
+      .icon-btn {
+        display: none !important;
+      }
+
+      body {
+        background: #fff;
+      }
+
+      .app {
+        display: block;
+      }
+
+      .content {
+        padding: 0;
+      }
+
+      .panel,
+      .card {
+        box-shadow: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" style="color:#fff">
+            <path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"></path>
+            <path d="M12 12 4.4 7.7"></path>
+            <path d="M12 12 19.6 7.7"></path>
+            <path d="M12 12v8.6"></path>
+            <path d="M15.5 4.9 8 9.2"></path>
+          </svg>
+        </div>
+        <div>
+          <h1>ระบบเบิก-จ่ายพัสดุ ครุภัณฑ์ รพ.สต.บ้านทับสอ</h1>
+          <span>Supply & Asset Online</span>
+        </div>
+      </div>
+      <nav class="nav-group" id="nav"></nav>
+    </aside>
+
+    <main class="content">
+      <header class="topbar">
+        <div class="top-title">
+          <h2 id="pageTitle">Dashboard ภาพรวม</h2>
+          <p id="pageSubtitle">ติดตามสต็อก คำขอเบิก ครุภัณฑ์ และงานซ่อมในหน้าเดียว</p>
+        </div>
+        <div class="top-actions">
+          <span class="connection" title="สถานะการเชื่อมต่อ">
+            <span class="dot" id="connectionDot"></span>
+            <span id="connectionText">กำลังตรวจสอบ</span>
+          </span>
+          <select id="currentUser" class="auth-only" title="ผู้ใช้งานที่เข้าสู่ระบบ"></select>
+          <button class="icon-btn secondary auth-only" id="syncBtn" title="ซิงก์ข้อมูล">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M21 12a9 9 0 0 1-15.5 6.2L3 16"></path>
+              <path d="M3 16v5h5"></path>
+              <path d="M3 12A9 9 0 0 1 18.5 5.8L21 8"></path>
+              <path d="M21 8V3h-5"></path>
+            </svg>
+          </button>
+          <button class="btn secondary auth-only" data-open="settings">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.2a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.2a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.2a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.2a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            ตั้งค่า
+          </button>
+          <button class="btn" id="loginBtn" onclick="openLoginModal()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+              <path d="m10 17 5-5-5-5"></path>
+              <path d="M15 12H3"></path>
+            </svg>
+            เข้าสู่ระบบ
+          </button>
+          <button class="btn secondary auth-only" id="logoutBtn" onclick="logout()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+              <path d="m16 17 5-5-5-5"></path>
+              <path d="M21 12H9"></path>
+            </svg>
+            ออกจากระบบ
+          </button>
+        </div>
+      </header>
+
+      <section class="section active" id="dashboard"></section>
+      <section class="section" id="supplies"></section>
+      <section class="section" id="receive"></section>
+      <section class="section" id="requisitions"></section>
+      <section class="section" id="assets"></section>
+      <section class="section" id="repairs"></section>
+      <section class="section" id="transfers"></section>
+      <section class="section" id="inventories"></section>
+      <section class="section" id="reports"></section>
+      <section class="section" id="settings"></section>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="modalBackdrop">
+    <div class="modal">
+      <div class="panel-head">
+        <h3 id="modalTitle">บันทึกข้อมูล</h3>
+        <button class="icon-btn secondary" id="closeModalBtn" title="ปิด">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M18 6 6 18"></path>
+            <path d="m6 6 12 12"></path>
+          </svg>
+        </button>
+      </div>
+      <div class="panel-body" id="modalBody"></div>
+    </div>
+  </div>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    const APP_CONFIG = {
+      SYSTEM_NAME: "ระบบเบิก-จ่ายพัสดุ ครุภัณฑ์ รพ.สต.บ้านทับสอ",
+      GAS_WEB_APP_URL: "https://script.google.com/macros/s/AKfycbyTpBSZ8Iv6N_GAHc5ICD5RLlR-8q8YaMq3wUgDUxs3y44uuAlBQVI1yRda09iHQorY/exec",
+      LOCAL_STORAGE_KEY: "rph_supply_asset_live_v1",
+      AUTH_STORAGE_KEY: "rph_supply_asset_auth_v1"
+    };
+
+    const ICONS = {
+      dashboard: '<path d="M3 13h8V3H3v10Z"></path><path d="M13 21h8V11h-8v10Z"></path><path d="M13 3v6h8V3h-8Z"></path><path d="M3 21h8v-6H3v6Z"></path>',
+      supplies: '<path d="M4 7.5 12 3l8 4.5v9L12 21l-8-4.5v-9Z"></path><path d="M12 12 4.4 7.7"></path><path d="M12 12 19.6 7.7"></path><path d="M12 12v8.6"></path>',
+      receive: '<path d="M12 3v12"></path><path d="m7 10 5 5 5-5"></path><path d="M5 21h14"></path>',
+      requisitions: '<path d="M9 11h6"></path><path d="M9 15h6"></path><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"></path><path d="M14 3v5h5"></path>',
+      assets: '<path d="M4 19V5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14"></path><path d="M2 19h20"></path><path d="M8 7h8"></path><path d="M8 11h8"></path><path d="M8 15h3"></path>',
+      repairs: '<path d="m14.7 6.3 3 3"></path><path d="M3 21h4l11-11a2.1 2.1 0 0 0-3-3L4 18v3Z"></path>',
+      transfers: '<path d="M17 3 21 7l-4 4"></path><path d="M3 7h18"></path><path d="m7 21-4-4 4-4"></path><path d="M21 17H3"></path>',
+      inventories: '<path d="M9 11l3 3L22 4"></path><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>',
+      reports: '<path d="M3 3v18h18"></path><path d="M7 15l4-4 3 3 6-8"></path>',
+      settings: '<path d="M12.2 2h-.4a2 2 0 0 0-2 2v.2a2 2 0 0 1-1 1.7l-.4.2a2 2 0 0 1-2 0l-.2-.1a2 2 0 0 0-2.7.7l-.2.4a2 2 0 0 0 .7 2.7l.2.1a2 2 0 0 1 1 1.7v.5a2 2 0 0 1-1 1.7l-.2.1a2 2 0 0 0-.7 2.7l.2.4a2 2 0 0 0 2.7.7l.2-.1a2 2 0 0 1 2 0l.4.2a2 2 0 0 1 1 1.7v.2a2 2 0 0 0 2 2h.4a2 2 0 0 0 2-2v-.2a2 2 0 0 1 1-1.7l.4-.2a2 2 0 0 1 2 0l.2.1a2 2 0 0 0 2.7-.7l.2-.4a2 2 0 0 0-.7-2.7l-.2-.1a2 2 0 0 1-1-1.7v-.5a2 2 0 0 1 1-1.7l.2-.1a2 2 0 0 0 .7-2.7l-.2-.4a2 2 0 0 0-2.7-.7l-.2.1a2 2 0 0 1-2 0l-.4-.2a2 2 0 0 1-1-1.7V4a2 2 0 0 0-2-2Z"></path><circle cx="12" cy="12" r="3"></circle>',
+      plus: '<path d="M12 5v14"></path><path d="M5 12h14"></path>',
+      edit: '<path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5Z"></path>',
+      trash: '<path d="M3 6h18"></path><path d="M8 6V4h8v2"></path><path d="M19 6l-1 14H6L5 6"></path>',
+      check: '<path d="m20 6-11 11-5-5"></path>',
+      x: '<path d="M18 6 6 18"></path><path d="m6 6 12 12"></path>',
+      file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"></path><path d="M14 2v6h6"></path>'
+    };
+
+    const MENU = [
+      ["dashboard", "Dashboard ภาพรวม", "ติดตามสต็อก คำขอเบิก ครุภัณฑ์ และงานซ่อมในหน้าเดียว"],
+      ["supplies", "ทะเบียนพัสดุ", "จัดการรายการพัสดุ หน่วยนับ ราคา จุดเตือน และคงเหลือ"],
+      ["receive", "รับเข้าพัสดุ", "บันทึกใบส่งของ ผู้ขาย แหล่งงบ และเพิ่มสต็อก"],
+      ["requisitions", "เบิกจ่าย/อนุมัติ", "ส่งคำขอ อนุมัติ และจ่ายพัสดุพร้อมตัดสต็อก"],
+      ["assets", "ทะเบียนครุภัณฑ์", "จัดเก็บเลขครุภัณฑ์ สถานที่ ผู้รับผิดชอบ สภาพ และ QR"],
+      ["repairs", "แจ้งซ่อม", "ติดตามงานซ่อม รูปภาพ อาการเสีย สถานะ และผลซ่อม"],
+      ["transfers", "โอนย้าย", "บันทึกการเปลี่ยนสถานที่และผู้รับผิดชอบ"],
+      ["inventories", "ตรวจนับประจำปี", "บันทึกผลตรวจนับ พบ ไม่พบ ชำรุด หรือรอจำหน่าย"],
+      ["reports", "รายงาน", "ส่งออกรายงานสต็อก เบิกจ่าย ครุภัณฑ์ และ PDF"],
+      ["settings", "ตั้งค่าระบบ", "เชื่อมต่อ Google Apps Script และจัดการผู้ใช้งาน"]
+    ];
+
+    const TH_MONTHS = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
+    const USER_ROLES = ["เจ้าหน้าที่ทั่วไป", "เจ้าหน้าที่พัสดุ", "หัวหน้าเจ้าหน้าที่พัสดุ", "ผอ.รพ.สต.บ้านทับสอ", "ผู้ดูแลระบบ"];
+
+    const state = {
+      page: "dashboard",
+      loading: false,
+      data: createSeedData(),
+      selectedUser: "",
+      gasUrl: localStorage.getItem("gasWebAppUrl") || APP_CONFIG.GAS_WEB_APP_URL,
+      connectionMode: "demo",
+      authUser: readAuthSession(),
+      reportFilter: { startDate: "", endDate: "", month: "", year: "" }
+    };
+
+    document.addEventListener("DOMContentLoaded", init);
+
+    function init() {
+      syncDefaultGasUrl();
+      state.data = readLocalData();
+      ensureDefaultUsers();
+      state.selectedUser = state.authUser?.id || "";
+      renderNav();
+      bindGlobalEvents();
+      renderAll();
+      loadFromServer();
+    }
+
+    function syncDefaultGasUrl() {
+      const storedUrl = localStorage.getItem("gasWebAppUrl") || "";
+      if (!storedUrl && APP_CONFIG.GAS_WEB_APP_URL) {
+        localStorage.setItem("gasWebAppUrl", APP_CONFIG.GAS_WEB_APP_URL);
+        state.gasUrl = APP_CONFIG.GAS_WEB_APP_URL;
+      }
+    }
+
+    function bindGlobalEvents() {
+      document.getElementById("syncBtn").addEventListener("click", () => loadFromServer(true));
+      document.getElementById("closeModalBtn").addEventListener("click", closeModal);
+      document.getElementById("modalBackdrop").addEventListener("click", event => {
+        if (event.target.id === "modalBackdrop") closeModal();
+      });
+      document.getElementById("currentUser").addEventListener("change", event => {
+        state.selectedUser = event.target.value;
+        toast("เปลี่ยนผู้ใช้งานแล้ว");
+      });
+      document.body.addEventListener("click", event => {
+        const opener = event.target.closest("[data-open]");
+        if (opener) setPage(opener.dataset.open);
+      });
+    }
+
+    function renderNav() {
+      const nav = document.getElementById("nav");
+      if (!isLoggedIn()) {
+        nav.innerHTML = `
+          <button class="nav-btn active" data-page="dashboard">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.dashboard}</svg>
+            <span>Dashboard ภาพรวม</span>
+          </button>
+          <button class="nav-btn" onclick="openLoginModal()">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path><path d="m10 17 5-5-5-5"></path><path d="M15 12H3"></path></svg>
+            <span>เข้าสู่ระบบ</span>
+          </button>
+        `;
+        nav.querySelector("[data-page]").addEventListener("click", () => setPage("dashboard"));
+        return;
+      }
+      const menuItems = isAdmin() ? MENU : MENU.filter(([id]) => id !== "settings");
+      nav.innerHTML = menuItems.map(([id, label]) => `
+        <button class="nav-btn ${state.page === id ? "active" : ""}" data-page="${id}">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[id]}</svg>
+          <span>${label}</span>
+          ${id === "requisitions" ? `<span class="nav-badge" id="pendingBadge">0</span>` : ""}
+        </button>
+      `).join("");
+      nav.querySelectorAll("[data-page]").forEach(button => {
+        button.addEventListener("click", () => setPage(button.dataset.page));
+      });
+    }
+
+    function renderAll() {
+      if (!isLoggedIn() && state.page !== "dashboard") state.page = "dashboard";
+      renderUsers();
+      renderConnection();
+      renderAuthControls();
+      renderNav();
+      renderPageHeader();
+      renderDashboard();
+      renderSupplies();
+      renderReceive();
+      renderRequisitions();
+      renderAssets();
+      renderRepairs();
+      renderTransfers();
+      renderInventories();
+      renderReports();
+      renderSettings();
+      updateBadges();
+      document.querySelectorAll(".section").forEach(section => {
+        section.classList.toggle("active", section.id === state.page);
+      });
+    }
+
+    function renderUsers() {
+      const userSelect = document.getElementById("currentUser");
+      if (!isLoggedIn()) {
+        userSelect.innerHTML = "";
+        return;
+      }
+      if (!state.data.users.some(user => user.id === state.selectedUser)) {
+        state.selectedUser = state.authUser?.id || state.data.users[0]?.id || "";
+      }
+      userSelect.innerHTML = state.data.users.map(user => `<option value="${user.id}">${escapeHtml(user.name)} - ${escapeHtml(user.role)}</option>`).join("");
+      userSelect.value = state.selectedUser || state.authUser?.id || state.data.users[0]?.id || "";
+      userSelect.disabled = true;
+    }
+
+    function renderAuthControls() {
+      const loggedIn = isLoggedIn();
+      document.querySelectorAll(".auth-only").forEach(element => {
+        element.style.display = loggedIn ? "" : "none";
+      });
+      document.getElementById("loginBtn").style.display = loggedIn ? "none" : "inline-flex";
+      document.getElementById("logoutBtn").style.display = loggedIn ? "inline-flex" : "none";
+      const settingsButton = document.querySelector('.top-actions [data-open="settings"]');
+      if (settingsButton) settingsButton.style.display = loggedIn && isAdmin() ? "inline-flex" : "none";
+    }
+
+    function renderConnection() {
+      const dot = document.getElementById("connectionDot");
+      const text = document.getElementById("connectionText");
+      dot.className = "dot";
+      if (state.connectionMode === "gas") {
+        dot.classList.add("online");
+        text.textContent = "เชื่อมต่อ Google Sheets";
+      } else if (state.connectionMode === "error") {
+        dot.classList.add("offline");
+        text.textContent = "เชื่อมต่อไม่สำเร็จ";
+      } else {
+        text.textContent = "โหมดทดลองในเครื่อง";
+      }
+    }
+
+    function renderPageHeader() {
+      const meta = MENU.find(item => item[0] === state.page) || MENU[0];
+      document.getElementById("pageTitle").textContent = meta[1];
+      document.getElementById("pageSubtitle").textContent = meta[2];
+    }
+
+    function setPage(page) {
+      if (!isLoggedIn() && page !== "dashboard") {
+        state.page = "dashboard";
+        renderAll();
+        openLoginModal();
+        return;
+      }
+      if (page === "settings" && !isAdmin()) {
+        state.page = "dashboard";
+        renderAll();
+        toast("เฉพาะผู้ดูแลระบบเท่านั้น");
+        return;
+      }
+      state.page = page;
+      renderAll();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function renderDashboard() {
+      const dashboard = getDashboard();
+      const lowSupplies = state.data.supplies.filter(item => Number(item.quantity) <= Number(item.minQty));
+      const pending = state.data.requisitions.filter(item => item.status === "รออนุมัติ");
+      const repairing = state.data.repairs.filter(item => ["รอรับเรื่อง", "กำลังซ่อม"].includes(item.status));
+      document.getElementById("dashboard").innerHTML = `
+        <div class="cards">
+          ${metricCard("พัสดุทั้งหมด", dashboard.totalSupplies, "รายการ", "supplies")}
+          ${metricCard("พัสดุใกล้หมด", dashboard.lowSupplies, "ต้องติดตาม", "receive", "warn")}
+          ${metricCard("ครุภัณฑ์ทั้งหมด", dashboard.totalAssets, "รายการ", "assets")}
+          ${metricCard("ครุภัณฑ์ชำรุด", dashboard.brokenAssets, "รอซ่อม/จำหน่าย", "repairs", "danger")}
+          ${metricCard("รออนุมัติ", dashboard.pendingRequests, "คำขอเบิก", "requisitions", "warn")}
+          ${metricCard("มูลค่าทรัพย์สิน", formatMoney(dashboard.assetValue), "บาท", "reports")}
+        </div>
+        ${isLoggedIn() ? `
+          <div class="quick-actions">
+            ${quickAction("ขอเบิกพัสดุ", "requisitions", "requisitions")}
+            ${quickAction("รับเข้าพัสดุ", "receive", "receive")}
+            ${quickAction("เพิ่มครุภัณฑ์", "assets", "assets")}
+            ${quickAction("แจ้งซ่อม", "repairs", "repairs")}
+          </div>
+        ` : dashboardLoginPrompt()}
+        <div class="dashboard-layout">
+          <div class="panel">
+            <div class="panel-head"><h3>การเบิกพัสดุรายเดือน</h3><span class="hint">12 เดือนล่าสุด</span></div>
+            <div class="panel-body">${renderMonthlyChart()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>สถานะครุภัณฑ์</h3><span class="hint">${dashboard.totalAssets} รายการ</span></div>
+            <div class="panel-body">${renderAssetDonut()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>ตารางแจ้งเตือน</h3><span class="hint">ข้อมูลที่ต้องดำเนินการ</span></div>
+            <div class="panel-body">
+              ${alertTable("พัสดุใกล้หมด", lowSupplies.map(item => [item.code, item.name, `${item.quantity} ${item.unit}`, item.minQty]))}
+              ${alertTable("คำขอรออนุมัติ", pending.map(item => [item.id, item.requester, item.supplyName, item.quantity]))}
+              ${alertTable("ครุภัณฑ์รอซ่อม", repairing.map(item => [item.id, item.assetName, item.issue, item.status]))}
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>กิจกรรมล่าสุด</h3><span class="hint">รับเข้า จ่ายออก ซ่อม และตรวจนับ</span></div>
+            <div class="panel-body">${activityList()}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function metricCard(label, value, suffix, page, tone = "") {
+      const toneClass = tone === "danger" ? "danger" : tone === "warn" ? "warn" : "ok";
+      return `
+        <button class="card metric" data-open="${page}" style="text-align:left">
+          <span class="label"><span class="status ${toneClass}">${label}</span></span>
+          <strong>${value}</strong>
+          <small>${suffix}</small>
+        </button>
+      `;
+    }
+
+    function quickAction(label, page, icon) {
+      return `
+        <button class="btn" data-open="${page}">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS[icon]}</svg>
+          ${label}
+        </button>
+      `;
+    }
+
+    function dashboardLoginPrompt() {
+      return `
+        <div class="panel" style="margin-bottom:16px">
+          <div class="panel-body" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+            <div>
+              <strong>Dashboard แสดงภาพรวมเท่านั้น</strong>
+              <div class="hint">กรุณาเข้าสู่ระบบเพื่อใช้งานเมนูทะเบียน รับเข้า เบิกจ่าย ครุภัณฑ์ รายงาน และตั้งค่าผู้ใช้งาน</div>
+            </div>
+            <button class="btn" onclick="openLoginModal()">เข้าสู่ระบบ</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSupplies() {
+      document.getElementById("supplies").innerHTML = `
+        <div class="panel">
+          <div class="panel-head">
+            <h3>ทะเบียนพัสดุ</h3>
+            <button class="btn" onclick="openSupplyForm()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.plus}</svg>เพิ่มพัสดุ</button>
+          </div>
+          <div class="panel-body">
+            ${toolbar("searchSupplies", "ค้นหารหัส ชื่อ หมวดหมู่ หรือสถานที่")}
+            <div class="table-wrap">${supplyTable()}</div>
+          </div>
+        </div>
+      `;
+      bindSearch("searchSupplies", renderSupplies);
+    }
+
+    function supplyTable() {
+      const rows = filterRows(state.data.supplies, "searchSupplies", ["code", "name", "category", "location"]);
+      if (!rows.length) return empty("ยังไม่มีข้อมูลพัสดุ");
+      return `
+        <table>
+          <thead><tr><th>รหัส</th><th>ชื่อพัสดุ</th><th>หมวดหมู่</th><th>หน่วย</th><th>ราคา</th><th>คงเหลือ</th><th>จุดเตือน</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody>
+            ${rows.map(item => `
+              <tr>
+                <td>${escapeHtml(item.code)}</td>
+                <td>${escapeHtml(item.name)}<br><span class="hint">${escapeHtml(item.location || "-")}</span></td>
+                <td>${escapeHtml(item.category)}</td>
+                <td>${escapeHtml(item.unit)}</td>
+                <td>${formatMoney(item.price)}</td>
+                <td>${formatNumber(item.quantity)}</td>
+                <td>${formatNumber(item.minQty)}</td>
+                <td>${stockStatus(item)}</td>
+                <td class="actions">
+                  <button class="icon-btn secondary" title="แก้ไข" onclick="openSupplyForm('${item.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.edit}</svg></button>
+                  <button class="icon-btn secondary" title="ลบ" onclick="deleteRecord('supplies','${item.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.trash}</svg></button>
+                </td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderReceive() {
+      document.getElementById("receive").innerHTML = `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h3>รับเข้าพัสดุ</h3></div>
+            <div class="panel-body">${receiveForm()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>ประวัติรับเข้า</h3><button class="btn secondary" onclick="exportCsv('receipts')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel</button></div>
+            <div class="panel-body">
+              ${toolbar("searchReceipts", "ค้นหาเลขเอกสาร ผู้ขาย หรือรายการ")}
+              <div class="table-wrap">${receiptTable()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindReceiveForm();
+      bindSearch("searchReceipts", renderReceive);
+    }
+
+    function receiveForm() {
+      return `
+        <form id="receiveForm" class="grid">
+          <div class="form-grid">
+            <div class="field span-6"><label>วันที่รับเข้า</label><input name="date" type="date" required value="${today()}"></div>
+            <div class="field span-6"><label>เลขที่เอกสาร/ใบส่งของ</label><input name="docNo" required placeholder="เช่น INV-2569-001"></div>
+            <div class="field span-6"><label>ผู้ขาย</label><input name="vendor" required></div>
+            <div class="field span-6"><label>แหล่งงบประมาณ</label><input name="budgetSource" placeholder="เช่น เงินบำรุง / งบประมาณรายจ่าย"></div>
+            <div class="field span-8"><label>รายการพัสดุ</label>${supplySelect("supplyId", true)}</div>
+            <div class="field span-2"><label>จำนวน</label><input name="quantity" type="number" min="1" required></div>
+            <div class="field span-2"><label>ราคา/หน่วย</label><input name="price" type="number" min="0" step="0.01"></div>
+            <div class="field span-12"><label>ไฟล์หลักฐาน</label><input name="fileName" type="file"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.receive}</svg>บันทึกรับเข้า</button>
+          </div>
+        </form>
+      `;
+    }
+
+    function receiptTable() {
+      const rows = filterRows(state.data.receipts, "searchReceipts", ["docNo", "vendor", "supplyName", "budgetSource"]);
+      if (!rows.length) return empty("ยังไม่มีประวัติรับเข้า");
+      return `
+        <table>
+          <thead><tr><th>วันที่</th><th>เลขเอกสาร</th><th>ผู้ขาย</th><th>รายการ</th><th>จำนวน</th><th>มูลค่า</th><th>แหล่งงบ</th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${formatDate(item.date)}</td><td>${escapeHtml(item.docNo)}</td><td>${escapeHtml(item.vendor)}</td>
+              <td>${escapeHtml(item.supplyName)}</td><td>${formatNumber(item.quantity)}</td>
+              <td>${formatMoney(Number(item.quantity) * Number(item.price || 0))}</td><td>${escapeHtml(item.budgetSource || "-")}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderRequisitions() {
+      document.getElementById("requisitions").innerHTML = `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h3>ขอเบิกพัสดุออนไลน์</h3></div>
+            <div class="panel-body">${requisitionForm()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>รายการเบิกจ่าย</h3><button class="btn secondary" onclick="exportCsv('requisitions')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel</button></div>
+            <div class="panel-body">
+              ${toolbar("searchRequisitions", "ค้นหาผู้ขอ รายการ เหตุผล หรือสถานะ")}
+              <div class="table-wrap">${requisitionTable()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindRequisitionForm();
+      bindSearch("searchRequisitions", renderRequisitions);
+    }
+
+    function requisitionForm() {
+      return `
+        <form id="requisitionForm" class="grid">
+          <div class="form-grid">
+            <div class="field span-6"><label>วันที่ขอเบิก</label><input name="date" type="date" required value="${today()}"></div>
+            <div class="field span-6"><label>ผู้ขอเบิก</label><input name="requester" required value="${escapeAttr(currentUser()?.name || "")}"></div>
+            <div class="field span-6"><label>หน่วยงาน/ฝ่าย</label><input name="department" value="${escapeAttr(currentUser()?.department || "")}"></div>
+            <div class="field span-6"><label>รายการพัสดุ</label>${supplySelect("supplyId", false)}</div>
+            <div class="field span-3"><label>จำนวน</label><input name="quantity" type="number" min="1" required></div>
+            <div class="field span-9"><label>เหตุผลการเบิก</label><input name="reason" required placeholder="ใช้ในงานบริการ/ทดแทนของเดิม/อื่น ๆ"></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.requisitions}</svg>ส่งคำขอเบิก</button>
+          </div>
+        </form>
+      `;
+    }
+
+    function requisitionTable() {
+      const rows = filterRows(state.data.requisitions, "searchRequisitions", ["requester", "supplyName", "reason", "status"]);
+      if (!rows.length) return empty("ยังไม่มีรายการเบิกจ่าย");
+      return `
+        <table>
+          <thead><tr><th>วันที่</th><th>ผู้ขอ</th><th>รายการ</th><th>จำนวน</th><th>เหตุผล</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${formatDate(item.date)}<br><span class="hint">${escapeHtml(item.id)}</span></td>
+              <td>${escapeHtml(item.requester)}<br><span class="hint">${escapeHtml(item.department || "-")}</span></td>
+              <td>${escapeHtml(item.supplyName)}</td><td>${formatNumber(item.quantity)}</td><td>${escapeHtml(item.reason || "-")}</td>
+              <td>${requestStatus(item.status)}</td>
+              <td class="actions">${requisitionActions(item)}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function requisitionActions(item) {
+      if (item.status === "รออนุมัติ") {
+        return `
+          <button class="icon-btn secondary" title="อนุมัติ" onclick="approveRequisition('${item.id}', true)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.check}</svg></button>
+          <button class="icon-btn secondary" title="ไม่อนุมัติ" onclick="approveRequisition('${item.id}', false)"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.x}</svg></button>
+        `;
+      }
+      if (item.status === "อนุมัติ") {
+        return `<button class="btn" onclick="issueRequisition('${item.id}')">จ่ายของ</button>`;
+      }
+      return `<button class="icon-btn secondary" title="ลบ" onclick="deleteRecord('requisitions','${item.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.trash}</svg></button>`;
+    }
+
+    function renderAssets() {
+      document.getElementById("assets").innerHTML = `
+        <div class="panel">
+          <div class="panel-head">
+            <h3>ทะเบียนครุภัณฑ์</h3>
+            <button class="btn" onclick="openAssetForm()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.plus}</svg>เพิ่มครุภัณฑ์</button>
+          </div>
+          <div class="panel-body">
+            ${toolbar("searchAssets", "ค้นหาเลขครุภัณฑ์ ชื่อ สถานที่ ผู้รับผิดชอบ หรือสถานะ")}
+            <div class="table-wrap">${assetTable()}</div>
+          </div>
+        </div>
+      `;
+      bindSearch("searchAssets", renderAssets);
+    }
+
+    function assetTable() {
+      const rows = filterRows(state.data.assets, "searchAssets", ["assetNo", "name", "location", "responsible", "status"]);
+      if (!rows.length) return empty("ยังไม่มีทะเบียนครุภัณฑ์");
+      return `
+        <table>
+          <thead><tr><th>QR</th><th>เลขครุภัณฑ์</th><th>รายการ</th><th>สถานที่</th><th>ผู้รับผิดชอบ</th><th>วันที่ได้มา</th><th>ราคา</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${qrCanvas(item.assetNo || item.id)}</td>
+              <td>${escapeHtml(item.assetNo)}</td>
+              <td>${escapeHtml(item.name)}<br><span class="hint">${escapeHtml([item.brand, item.model, item.serial].filter(Boolean).join(" / ") || "-")}</span></td>
+              <td>${escapeHtml(item.location)}</td><td>${escapeHtml(item.responsible)}</td><td>${formatDate(item.acquiredDate)}</td>
+              <td>${formatMoney(item.price)}</td><td>${assetStatus(item.status)}</td>
+              <td class="actions">
+                <button class="icon-btn secondary" title="แก้ไข" onclick="openAssetForm('${item.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.edit}</svg></button>
+                <button class="icon-btn secondary" title="ลบ" onclick="deleteRecord('assets','${item.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.trash}</svg></button>
+              </td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderRepairs() {
+      document.getElementById("repairs").innerHTML = `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h3>แจ้งซ่อมครุภัณฑ์</h3></div>
+            <div class="panel-body">${repairForm()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>ติดตามงานซ่อม</h3><button class="btn secondary" onclick="exportCsv('repairs')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel</button></div>
+            <div class="panel-body">
+              ${toolbar("searchRepairs", "ค้นหารายการ อาการเสีย ผู้แจ้ง หรือสถานะ")}
+              <div class="table-wrap">${repairTable()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindRepairForm();
+      bindSearch("searchRepairs", renderRepairs);
+    }
+
+    function repairForm() {
+      return `
+        <form id="repairForm" class="grid">
+          <div class="form-grid">
+            <div class="field span-6"><label>วันที่แจ้ง</label><input name="date" type="date" value="${today()}" required></div>
+            <div class="field span-6"><label>ผู้แจ้ง</label><input name="reporter" value="${escapeAttr(currentUser()?.name || "")}" required></div>
+            <div class="field span-12"><label>ครุภัณฑ์</label>${assetSelect("assetId")}</div>
+            <div class="field span-12"><label>อาการเสีย</label><textarea name="issue" required></textarea></div>
+            <div class="field span-6"><label>รูปภาพ</label><input name="photoName" type="file"></div>
+            <div class="field span-6"><label>สถานะ</label>${select("status", ["รอรับเรื่อง", "กำลังซ่อม", "ซ่อมเสร็จ", "จำหน่าย/ใช้งานไม่ได้"])}</div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.repairs}</svg>บันทึกแจ้งซ่อม</button>
+          </div>
+        </form>
+      `;
+    }
+
+    function repairTable() {
+      const rows = filterRows(state.data.repairs, "searchRepairs", ["assetName", "assetNo", "issue", "reporter", "status"]);
+      if (!rows.length) return empty("ยังไม่มีงานซ่อม");
+      return `
+        <table>
+          <thead><tr><th>วันที่</th><th>ครุภัณฑ์</th><th>อาการเสีย</th><th>ผู้แจ้ง</th><th>สถานะ</th><th>ผลการซ่อม</th><th></th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${formatDate(item.date)}</td><td>${escapeHtml(item.assetName)}<br><span class="hint">${escapeHtml(item.assetNo || "-")}</span></td>
+              <td>${escapeHtml(item.issue)}</td><td>${escapeHtml(item.reporter)}</td><td>${repairStatus(item.status)}</td>
+              <td>${escapeHtml(item.result || "-")}</td>
+              <td class="actions"><button class="btn secondary" onclick="openRepairUpdate('${item.id}')">อัปเดต</button></td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderTransfers() {
+      document.getElementById("transfers").innerHTML = `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h3>โอนย้าย/เปลี่ยนผู้รับผิดชอบ</h3></div>
+            <div class="panel-body">${transferForm()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>ประวัติโอนย้าย</h3><button class="btn secondary" onclick="exportCsv('transfers')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel</button></div>
+            <div class="panel-body">
+              ${toolbar("searchTransfers", "ค้นหารายการ สถานที่ หรือผู้รับผิดชอบ")}
+              <div class="table-wrap">${transferTable()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindTransferForm();
+      bindSearch("searchTransfers", renderTransfers);
+    }
+
+    function transferForm() {
+      return `
+        <form id="transferForm" class="grid">
+          <div class="form-grid">
+            <div class="field span-6"><label>วันที่โอนย้าย</label><input name="date" type="date" value="${today()}" required></div>
+            <div class="field span-6"><label>ครุภัณฑ์</label>${assetSelect("assetId")}</div>
+            <div class="field span-6"><label>จากสถานที่</label><input name="fromLocation"></div>
+            <div class="field span-6"><label>ไปสถานที่</label><input name="toLocation" required></div>
+            <div class="field span-6"><label>ผู้รับผิดชอบเดิม</label><input name="fromResponsible"></div>
+            <div class="field span-6"><label>ผู้รับผิดชอบใหม่</label><input name="toResponsible" required></div>
+            <div class="field span-12"><label>หมายเหตุ</label><textarea name="note"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.transfers}</svg>บันทึกโอนย้าย</button>
+          </div>
+        </form>
+      `;
+    }
+
+    function transferTable() {
+      const rows = filterRows(state.data.transfers, "searchTransfers", ["assetName", "assetNo", "fromLocation", "toLocation", "fromResponsible", "toResponsible"]);
+      if (!rows.length) return empty("ยังไม่มีประวัติโอนย้าย");
+      return `
+        <table>
+          <thead><tr><th>วันที่</th><th>ครุภัณฑ์</th><th>สถานที่</th><th>ผู้รับผิดชอบ</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${formatDate(item.date)}</td><td>${escapeHtml(item.assetName)}<br><span class="hint">${escapeHtml(item.assetNo || "-")}</span></td>
+              <td>${escapeHtml(item.fromLocation || "-")} → ${escapeHtml(item.toLocation)}</td>
+              <td>${escapeHtml(item.fromResponsible || "-")} → ${escapeHtml(item.toResponsible)}</td>
+              <td>${escapeHtml(item.note || "-")}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderInventories() {
+      document.getElementById("inventories").innerHTML = `
+        <div class="split">
+          <div class="panel">
+            <div class="panel-head"><h3>ตรวจนับประจำปี</h3></div>
+            <div class="panel-body">${inventoryForm()}</div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>รายงานตรวจนับ</h3><button class="btn secondary" onclick="exportCsv('inventories')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel</button></div>
+            <div class="panel-body">
+              ${toolbar("searchInventories", "ค้นหาปี รายการ ผู้ตรวจ หรือสถานะ")}
+              <div class="table-wrap">${inventoryTable()}</div>
+            </div>
+          </div>
+        </div>
+      `;
+      bindInventoryForm();
+      bindSearch("searchInventories", renderInventories);
+    }
+
+    function inventoryForm() {
+      return `
+        <form id="inventoryForm" class="grid">
+          <div class="form-grid">
+            <div class="field span-3"><label>ปีงบประมาณ</label><input name="year" type="number" min="2500" value="${new Date().getFullYear() + 543}" required></div>
+            <div class="field span-3"><label>วันที่ตรวจ</label><input name="date" type="date" value="${today()}" required></div>
+            <div class="field span-6"><label>ครุภัณฑ์</label>${assetSelect("assetId")}</div>
+            <div class="field span-6"><label>สถานะตรวจนับ</label>${select("status", ["พบ", "ไม่พบ", "ชำรุด", "รอจำหน่าย"])}</div>
+            <div class="field span-6"><label>ผู้ตรวจ</label><input name="inspector" value="${escapeAttr(currentUser()?.name || "")}" required></div>
+            <div class="field span-12"><label>หมายเหตุ</label><textarea name="note"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.inventories}</svg>บันทึกตรวจนับ</button>
+          </div>
+        </form>
+      `;
+    }
+
+    function inventoryTable() {
+      const rows = filterRows(state.data.inventories, "searchInventories", ["year", "assetName", "assetNo", "status", "inspector"]);
+      if (!rows.length) return empty("ยังไม่มีผลตรวจนับ");
+      return `
+        <table>
+          <thead><tr><th>ปี</th><th>วันที่</th><th>ครุภัณฑ์</th><th>สถานะ</th><th>ผู้ตรวจ</th><th>หมายเหตุ</th></tr></thead>
+          <tbody>${rows.map(item => `
+            <tr>
+              <td>${escapeHtml(item.year)}</td><td>${formatDate(item.date)}</td>
+              <td>${escapeHtml(item.assetName)}<br><span class="hint">${escapeHtml(item.assetNo || "-")}</span></td>
+              <td>${inventoryStatus(item.status)}</td><td>${escapeHtml(item.inspector)}</td><td>${escapeHtml(item.note || "-")}</td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function renderReports() {
+      const report = getFilteredReportData();
+      document.getElementById("reports").innerHTML = `
+        <div class="grid">
+          <div class="panel">
+            <div class="panel-head">
+              <h3>รายงานผู้บริหาร</h3>
+              <div class="top-actions">
+                <button class="btn secondary" onclick="window.print()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>PDF</button>
+                <button class="btn secondary" onclick="exportFilteredCsv()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>Excel ตามช่วงที่เลือก</button>
+              </div>
+            </div>
+            <div class="panel-body">
+              <div class="form-grid" style="margin-bottom:16px">
+                <div class="field span-3"><label>วันที่เริ่ม</label><input id="reportStartDate" type="date" value="${escapeAttr(state.reportFilter.startDate)}"></div>
+                <div class="field span-3"><label>วันที่สิ้นสุด</label><input id="reportEndDate" type="date" value="${escapeAttr(state.reportFilter.endDate)}"></div>
+                <div class="field span-3"><label>เดือน</label>${monthSelect("reportMonth", state.reportFilter.month)}</div>
+                <div class="field span-3"><label>ปี พ.ศ.</label><input id="reportYear" type="number" min="2500" max="2700" placeholder="เช่น 2569" value="${escapeAttr(state.reportFilter.year)}"></div>
+              </div>
+              <div class="form-actions" style="justify-content:flex-start;margin-top:0;margin-bottom:16px">
+                <button class="btn" onclick="applyReportFilter()">แสดงรายงาน</button>
+                <button class="btn secondary" onclick="clearReportFilter()">ล้างตัวกรอง</button>
+              </div>
+              <div class="hint" style="margin-bottom:12px">ช่วงรายงาน: ${escapeHtml(report.label)}</div>
+              <div class="cards">
+                ${metricCard("พัสดุคงเหลือ", state.data.supplies.reduce((sum, item) => sum + Number(item.quantity || 0), 0), "หน่วย", "supplies")}
+                ${metricCard("เบิกจ่ายตามช่วง", report.requisitions.filter(item => item.status === "จ่ายแล้ว").reduce((sum, item) => sum + Number(item.quantity || 0), 0), "หน่วย", "requisitions")}
+                ${metricCard("มูลค่าสต็อก", formatMoney(stockValue()), "บาท", "reports")}
+                ${metricCard("รับเข้าตามช่วง", report.receipts.reduce((sum, item) => sum + Number(item.quantity || 0), 0), "หน่วย", "receive")}
+                ${metricCard("งานซ่อมตามช่วง", report.repairs.length, "รายการ", "repairs", "warn")}
+                ${metricCard("ตรวจนับตามช่วง", report.inventories.length, "รายการ", "inventories")}
+              </div>
+              ${reportSummaryTable(report)}
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-head"><h3>ส่งออกรายงาน</h3></div>
+            <div class="panel-body">
+              <div class="quick-actions">
+                ${reportButton("supplies", "รายงานพัสดุคงเหลือ")}
+                ${reportButton("requisitions", "รายงานเบิกจ่าย")}
+                ${reportButton("receipts", "รายงานรับเข้า")}
+                ${reportButton("assets", "รายงานครุภัณฑ์")}
+                ${reportButton("repairs", "รายงานครุภัณฑ์ชำรุด")}
+                ${reportButton("inventories", "รายงานตรวจนับ")}
+                ${reportButton("transfers", "รายงานโอนย้าย")}
+                ${reportButton("users", "รายงานผู้ใช้งาน")}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    function reportButton(collection, label) {
+      return `<button class="btn" onclick="exportReportCsv('${collection}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.file}</svg>${label}</button>`;
+    }
+
+    function monthSelect(id, current) {
+      return `<select id="${id}"><option value="">ทุกเดือน</option>${TH_MONTHS.map((month, index) => `<option value="${index + 1}" ${String(index + 1) === String(current) ? "selected" : ""}>${month}</option>`).join("")}</select>`;
+    }
+
+    function applyReportFilter() {
+      state.reportFilter = {
+        startDate: document.getElementById("reportStartDate").value,
+        endDate: document.getElementById("reportEndDate").value,
+        month: document.getElementById("reportMonth").value,
+        year: document.getElementById("reportYear").value
+      };
+      renderReports();
+      toast("แสดงรายงานตามช่วงที่เลือกแล้ว");
+    }
+
+    function clearReportFilter() {
+      state.reportFilter = { startDate: "", endDate: "", month: "", year: "" };
+      renderReports();
+    }
+
+    function getFilteredReportData() {
+      const range = getReportRange();
+      const data = {};
+      ["supplies", "receipts", "requisitions", "assets", "repairs", "transfers", "inventories", "users"].forEach(collection => {
+        data[collection] = getReportRows(collection, range);
+      });
+      data.label = range.label;
+      return data;
+    }
+
+    function getReportRange() {
+      let start = state.reportFilter.startDate || "";
+      let end = state.reportFilter.endDate || "";
+      const month = Number(state.reportFilter.month || 0);
+      const buddhistYear = Number(state.reportFilter.year || (month ? new Date().getFullYear() + 543 : 0));
+      const year = buddhistYear ? buddhistYear - 543 : 0;
+      if (!start && !end && year) {
+        if (month) {
+          start = `${year}-${String(month).padStart(2, "0")}-01`;
+          end = new Date(year, month, 0).toISOString().slice(0, 10);
+        } else {
+          start = `${year}-01-01`;
+          end = `${year}-12-31`;
+        }
+      }
+      const label = start || end ? `${start || "เริ่มต้น"} ถึง ${end || "ปัจจุบัน"}` : "ข้อมูลทั้งหมด";
+      return { start, end, label };
+    }
+
+    function getReportRows(collection, range = getReportRange()) {
+      const rows = state.data[collection] || [];
+      if (!range.start && !range.end) return rows;
+      return rows.filter(row => {
+        const date = getReportDate(collection, row);
+        if (!date) return collection === "supplies";
+        return (!range.start || date >= range.start) && (!range.end || date <= range.end);
+      });
+    }
+
+    function getReportDate(collection, row) {
+      if (collection === "assets") return String(row.acquiredDate || row.updatedAt || "").slice(0, 10);
+      if (collection === "users") return String(row.updatedAt || "").slice(0, 10);
+      if (collection === "supplies") return String(row.updatedAt || "").slice(0, 10);
+      return String(row.date || row.createdAt || row.updatedAt || row.issuedAt || row.approvedAt || "").slice(0, 10);
+    }
+
+    function reportSummaryTable(report) {
+      const rows = [
+        ["รับเข้าพัสดุ", report.receipts.length, report.receipts.reduce((sum, item) => sum + Number(item.quantity || 0), 0)],
+        ["เบิกจ่ายพัสดุ", report.requisitions.length, report.requisitions.reduce((sum, item) => sum + Number(item.quantity || 0), 0)],
+        ["ทะเบียนครุภัณฑ์", report.assets.length, "-"],
+        ["งานซ่อม", report.repairs.length, "-"],
+        ["โอนย้าย", report.transfers.length, "-"],
+        ["ตรวจนับ", report.inventories.length, "-"]
+      ];
+      return `
+        <div class="table-wrap" style="margin-top:14px">
+          <table>
+            <thead><tr><th>หมวดรายงาน</th><th>จำนวนรายการ</th><th>จำนวนรวม</th></tr></thead>
+            <tbody>${rows.map(row => `<tr><td>${row[0]}</td><td>${formatNumber(row[1])}</td><td>${typeof row[2] === "number" ? formatNumber(row[2]) : row[2]}</td></tr>`).join("")}</tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderSettings() {
+      if (!isAdmin()) {
+        document.getElementById("settings").innerHTML = `<div class="panel"><div class="panel-body">${empty("เฉพาะผู้ดูแลระบบเท่านั้น")}</div></div>`;
+        return;
+      }
+      document.getElementById("settings").innerHTML = `
+        <div class="panel">
+          <div class="panel-head"><h3>ตั้งค่าการเชื่อมต่อ</h3></div>
+          <div class="panel-body">
+            <div class="settings-box">
+              <div class="field span-12">
+                <label>Google Apps Script Web App URL</label>
+                <input id="gasUrlInput" value="${escapeAttr(state.gasUrl || "")}" placeholder="https://script.google.com/macros/s/.../exec">
+                <div class="hint">วาง URL หลัง Deploy เป็น Web App แล้วกดบันทึก หน้า HTML นี้จะอ่าน/เขียนข้อมูลลง Google Sheets ผ่าน Apps Script</div>
+              </div>
+              <div class="form-actions" style="justify-content:flex-start">
+                <button class="btn" onclick="saveGasUrl()">บันทึก URL</button>
+                <button class="btn secondary" onclick="resetDemoData()">ล้างข้อมูลเริ่มต้น</button>
+                <button class="btn secondary" onclick="clearServerData()">ล้างข้อมูลใน Google Sheets</button>
+                <button class="btn secondary" onclick="loadFromServer(true)">ทดสอบเชื่อมต่อ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-head"><h3>ผู้ใช้งานและสิทธิ์</h3><button class="btn" onclick="openUserForm()"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.plus}</svg>เพิ่มผู้ใช้</button></div>
+          <div class="panel-body">
+            <div class="table-wrap">${usersTable()}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function usersTable() {
+      if (!state.data.users.length) return empty("ยังไม่มีผู้ใช้งาน");
+      return `
+        <table>
+          <thead><tr><th>ชื่อ</th><th>User</th><th>ตำแหน่ง</th><th>หน่วยงาน</th><th>บทบาท</th><th>สถานะ</th><th></th></tr></thead>
+          <tbody>${state.data.users.map(user => `
+            <tr>
+              <td>${escapeHtml(user.name)}</td><td>${escapeHtml(user.username || "-")}</td><td>${escapeHtml(user.position || "-")}</td><td>${escapeHtml(user.department || "-")}</td>
+              <td>${escapeHtml(user.role)}</td><td>${assetStatus(user.active === "N" ? "ปิดใช้งาน" : "ใช้งาน")}</td>
+              <td class="actions">
+                <button class="icon-btn secondary" title="แก้ไข" onclick="openUserForm('${user.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.edit}</svg></button>
+                <button class="icon-btn secondary" title="ลบ" onclick="deleteRecord('users','${user.id}')"><svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">${ICONS.trash}</svg></button>
+              </td>
+            </tr>
+          `).join("")}</tbody>
+        </table>
+      `;
+    }
+
+    function openSupplyForm(id = "") {
+      const item = state.data.supplies.find(row => row.id === id) || {};
+      openModal(id ? "แก้ไขทะเบียนพัสดุ" : "เพิ่มทะเบียนพัสดุ", `
+        <form id="supplyForm">
+          <div class="form-grid">
+            <input type="hidden" name="id" value="${escapeAttr(item.id || "")}">
+            <div class="field span-4"><label>รหัสพัสดุ</label><input name="code" required value="${escapeAttr(item.code || "")}"></div>
+            <div class="field span-8"><label>ชื่อพัสดุ</label><input name="name" required value="${escapeAttr(item.name || "")}"></div>
+            <div class="field span-4"><label>หมวดหมู่</label><input name="category" value="${escapeAttr(item.category || "")}"></div>
+            <div class="field span-2"><label>หน่วยนับ</label><input name="unit" required value="${escapeAttr(item.unit || "")}"></div>
+            <div class="field span-3"><label>ราคา/หน่วย</label><input name="price" type="number" min="0" step="0.01" value="${escapeAttr(item.price || 0)}"></div>
+            <div class="field span-3"><label>จำนวนคงเหลือ</label><input name="quantity" type="number" min="0" value="${escapeAttr(item.quantity || 0)}"></div>
+            <div class="field span-3"><label>จุดแจ้งเตือน</label><input name="minQty" type="number" min="0" value="${escapeAttr(item.minQty || 0)}"></div>
+            <div class="field span-9"><label>สถานที่เก็บ</label><input name="location" value="${escapeAttr(item.location || "")}"></div>
+          </div>
+          <div class="form-actions"><button class="btn" type="submit">บันทึก</button></div>
+        </form>
+      `);
+      document.getElementById("supplyForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        await saveRecord("saveSupply", await formToObject(event.target));
+        closeModal();
+      });
+    }
+
+    function openAssetForm(id = "") {
+      const item = state.data.assets.find(row => row.id === id) || {};
+      openModal(id ? "แก้ไขทะเบียนครุภัณฑ์" : "เพิ่มทะเบียนครุภัณฑ์", `
+        <form id="assetForm">
+          <div class="form-grid">
+            <input type="hidden" name="id" value="${escapeAttr(item.id || "")}">
+            <div class="field span-4"><label>เลขครุภัณฑ์</label><input name="assetNo" required value="${escapeAttr(item.assetNo || "")}"></div>
+            <div class="field span-8"><label>ชื่อรายการ</label><input name="name" required value="${escapeAttr(item.name || "")}"></div>
+            <div class="field span-3"><label>ยี่ห้อ</label><input name="brand" value="${escapeAttr(item.brand || "")}"></div>
+            <div class="field span-3"><label>รุ่น</label><input name="model" value="${escapeAttr(item.model || "")}"></div>
+            <div class="field span-3"><label>Serial Number</label><input name="serial" value="${escapeAttr(item.serial || "")}"></div>
+            <div class="field span-3"><label>วันที่ได้มา</label><input name="acquiredDate" type="date" value="${escapeAttr(item.acquiredDate || today())}"></div>
+            <div class="field span-4"><label>สถานที่ตั้ง</label><input name="location" required value="${escapeAttr(item.location || "")}"></div>
+            <div class="field span-4"><label>ผู้รับผิดชอบ</label><input name="responsible" required value="${escapeAttr(item.responsible || "")}"></div>
+            <div class="field span-4"><label>ราคา</label><input name="price" type="number" min="0" step="0.01" value="${escapeAttr(item.price || 0)}"></div>
+            <div class="field span-4"><label>แหล่งงบประมาณ</label><input name="budgetSource" value="${escapeAttr(item.budgetSource || "")}"></div>
+            <div class="field span-4"><label>สภาพการใช้งาน</label>${select("status", ["ใช้งาน", "ชำรุด", "รอซ่อม", "รอจำหน่าย", "จำหน่ายแล้ว"], item.status || "ใช้งาน")}</div>
+            <div class="field span-4"><label>รูปภาพ</label><input name="imageName" type="file"></div>
+          </div>
+          <div class="form-actions"><button class="btn" type="submit">บันทึก</button></div>
+        </form>
+      `);
+      document.getElementById("assetForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        await saveRecord("saveAsset", await formToObject(event.target, true));
+        closeModal();
+      });
+    }
+
+    function openRepairUpdate(id) {
+      const item = state.data.repairs.find(row => row.id === id);
+      if (!item) return;
+      openModal("อัปเดตงานซ่อม", `
+        <form id="repairUpdateForm">
+          <div class="form-grid">
+            <input type="hidden" name="id" value="${escapeAttr(item.id)}">
+            <div class="field span-6"><label>สถานะ</label>${select("status", ["รอรับเรื่อง", "กำลังซ่อม", "ซ่อมเสร็จ", "จำหน่าย/ใช้งานไม่ได้"], item.status)}</div>
+            <div class="field span-12"><label>ผลการซ่อม</label><textarea name="result">${escapeHtml(item.result || "")}</textarea></div>
+          </div>
+          <div class="form-actions"><button class="btn" type="submit">บันทึก</button></div>
+        </form>
+      `);
+      document.getElementById("repairUpdateForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        await saveRecord("saveRepair", { ...item, ...(await formToObject(event.target)) });
+        closeModal();
+      });
+    }
+
+    function openUserForm(id = "") {
+      const item = state.data.users.find(row => row.id === id) || {};
+      openModal(id ? "แก้ไขผู้ใช้งาน" : "เพิ่มผู้ใช้งาน", `
+        <form id="userForm">
+          <div class="form-grid">
+            <input type="hidden" name="id" value="${escapeAttr(item.id || "")}">
+            <div class="field span-6"><label>ชื่อ</label><input name="name" required value="${escapeAttr(item.name || "")}"></div>
+            <div class="field span-3"><label>User</label><input name="username" required value="${escapeAttr(item.username || "")}"></div>
+            <div class="field span-3"><label>Password</label><input name="password" type="password" ${id ? "" : "required"} placeholder="${id ? "เว้นว่างหากไม่เปลี่ยน" : ""}"></div>
+            <div class="field span-6"><label>ตำแหน่ง</label><input name="position" value="${escapeAttr(item.position || "")}"></div>
+            <div class="field span-6"><label>หน่วยงาน</label><input name="department" value="${escapeAttr(item.department || "")}"></div>
+            <div class="field span-6"><label>บทบาท</label>${select("role", USER_ROLES, normalizeUserRole(item.role || "เจ้าหน้าที่ทั่วไป"))}</div>
+            <div class="field span-6"><label>สถานะ</label>${select("active", ["Y", "N"], item.active || "Y")}</div>
+          </div>
+          <div class="form-actions"><button class="btn" type="submit">บันทึก</button></div>
+        </form>
+      `);
+      document.getElementById("userForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        await saveRecord("saveUser", await formToObject(event.target));
+        closeModal();
+      });
+    }
+
+    function bindReceiveForm() {
+      const form = document.getElementById("receiveForm");
+      if (!form) return;
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target, true);
+        const supply = state.data.supplies.find(item => item.id === payload.supplyId);
+        payload.supplyName = supply?.name || "";
+        payload.price = payload.price || supply?.price || 0;
+        await saveRecord("receiveSupply", payload);
+        event.target.reset();
+      });
+    }
+
+    function bindRequisitionForm() {
+      const form = document.getElementById("requisitionForm");
+      if (!form) return;
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target);
+        const supply = state.data.supplies.find(item => item.id === payload.supplyId);
+        payload.supplyName = supply?.name || "";
+        payload.status = "รออนุมัติ";
+        await saveRecord("requestSupply", payload);
+        event.target.reset();
+      });
+    }
+
+    function bindRepairForm() {
+      const form = document.getElementById("repairForm");
+      if (!form) return;
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target, true);
+        const asset = state.data.assets.find(item => item.id === payload.assetId);
+        payload.assetNo = asset?.assetNo || "";
+        payload.assetName = asset?.name || "";
+        await saveRecord("saveRepair", payload);
+        event.target.reset();
+      });
+    }
+
+    function bindTransferForm() {
+      const form = document.getElementById("transferForm");
+      if (!form) return;
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target);
+        const asset = state.data.assets.find(item => item.id === payload.assetId);
+        payload.assetNo = asset?.assetNo || "";
+        payload.assetName = asset?.name || "";
+        await saveRecord("saveTransfer", payload);
+        event.target.reset();
+      });
+    }
+
+    function bindInventoryForm() {
+      const form = document.getElementById("inventoryForm");
+      if (!form) return;
+      form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target);
+        const asset = state.data.assets.find(item => item.id === payload.assetId);
+        payload.assetNo = asset?.assetNo || "";
+        payload.assetName = asset?.name || "";
+        await saveRecord("saveInventory", payload);
+        event.target.reset();
+      });
+    }
+
+    async function approveRequisition(id, approved) {
+      const reason = approved ? "" : prompt("เหตุผลที่ไม่อนุมัติ") || "";
+      await saveRecord("approveRequisition", { id, approved, reason, approver: currentUser()?.name || "" });
+    }
+
+    async function issueRequisition(id) {
+      await saveRecord("issueRequisition", { id, issuer: currentUser()?.name || "" });
+    }
+
+    async function deleteRecord(collection, id) {
+      if (!confirm("ยืนยันการลบข้อมูลรายการนี้")) return;
+      await saveRecord("deleteRecord", { collection, id });
+    }
+
+    async function saveRecord(action, payload) {
+      if (!isLoggedIn()) {
+        openLoginModal();
+        return;
+      }
+      try {
+        const result = await api(action, payload);
+        if (result && result.data) state.data = normalizeData(result.data);
+        persistLocalData();
+        renderAll();
+        toast("บันทึกข้อมูลสำเร็จ");
+      } catch (error) {
+        state.connectionMode = "error";
+        renderConnection();
+        toast(error.message || "บันทึกไม่สำเร็จ");
+      }
+    }
+
+    async function clearServerData() {
+      if (!isAdmin()) return toast("เฉพาะผู้ดูแลระบบเท่านั้น");
+      if (!confirm("ยืนยันล้างข้อมูลการใช้งานทั้งหมดใน Google Sheets และคงไว้เฉพาะ User Boss")) return;
+      try {
+        const result = await api("clearOperationalData", {});
+        if (result && result.data) state.data = normalizeData(result.data);
+        ensureDefaultUsers();
+        persistLocalData();
+        renderAll();
+        toast("ล้างข้อมูลใน Google Sheets แล้ว");
+      } catch (error) {
+        toast(error.message || "ล้างข้อมูลไม่สำเร็จ กรุณาอัปเดต Code.gs และ Deploy ใหม่ก่อน");
+      }
+    }
+
+    async function loadFromServer(showToast = false) {
+      try {
+        const result = await api("getAppData", {});
+        if (result && result.data) {
+          state.data = normalizeData(result.data);
+          ensureDefaultUsers();
+          if (state.authUser) {
+            const freshUser = state.data.users.find(user => user.id === state.authUser.id || user.username === state.authUser.username);
+            if (freshUser) state.authUser = { ...state.authUser, ...sanitizeAuthUser(freshUser) };
+          }
+          state.connectionMode = state.gasUrl || hasGoogleScriptRun() ? "gas" : "demo";
+          persistLocalData();
+          renderAll();
+          if (showToast) toast("ซิงก์ข้อมูลสำเร็จ");
+        }
+      } catch (error) {
+        state.connectionMode = state.gasUrl ? "error" : "demo";
+        renderConnection();
+        if (showToast) toast(error.message || "ไม่สามารถซิงก์ข้อมูลได้");
+      }
+    }
+
+    function api(action, payload) {
+      if (hasGoogleScriptRun()) return gasRun(action, payload);
+      if (state.gasUrl) return jsonpRun(action, payload);
+      return Promise.resolve(localRun(action, payload));
+    }
+
+    function hasGoogleScriptRun() {
+      return typeof google !== "undefined" && google.script && google.script.run;
+    }
+
+    function gasRun(action, payload) {
+      return new Promise((resolve, reject) => {
+        google.script.run
+          .withSuccessHandler(resolve)
+          .withFailureHandler(error => reject(new Error(error.message || error)))
+          .runAction(action, payload || {});
+      });
+    }
+
+    function jsonpRun(action, payload) {
+      return new Promise((resolve, reject) => {
+        const callbackName = `gasCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
+        const script = document.createElement("script");
+        const timeout = setTimeout(() => {
+          cleanup();
+          reject(new Error("หมดเวลารอการตอบกลับจาก Apps Script"));
+        }, 25000);
+
+        window[callbackName] = response => {
+          cleanup();
+          if (!response || response.ok === false) reject(new Error(response?.message || "Apps Script แจ้งข้อผิดพลาด"));
+          else resolve(response);
+        };
+
+        function cleanup() {
+          clearTimeout(timeout);
+          delete window[callbackName];
+          script.remove();
+        }
+
+        const encoded = encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(sanitizeJsonpPayload(payload || {}))))));
+        const sep = state.gasUrl.includes("?") ? "&" : "?";
+        script.src = `${state.gasUrl}${sep}action=${encodeURIComponent(action)}&payload=${encoded}&callback=${callbackName}&t=${Date.now()}`;
+        script.onerror = () => {
+          cleanup();
+          reject(new Error("เรียก Apps Script ไม่สำเร็จ"));
+        };
+        document.body.appendChild(script);
+      });
+    }
+
+    function sanitizeJsonpPayload(payload) {
+      const clean = { ...payload };
+      Object.keys(clean).forEach(key => {
+        if (key.endsWith("DataUrl")) delete clean[key];
+      });
+      return clean;
+    }
+
+    function localRun(action, payload = {}) {
+      const data = structuredCloneSafe(state.data);
+      const now = new Date().toISOString();
+      if (action === "loginUser") {
+        const username = normalizeUsername(payload.username);
+        const user = data.users.find(item => normalizeUsername(item.username) === username && String(item.password || "") === String(payload.password || "") && item.active !== "N");
+        if (!user) throw new Error("User หรือ Password ไม่ถูกต้อง");
+        return { ok: true, user: sanitizeAuthUser(user), data };
+      }
+      if (action === "clearOperationalData") {
+        Object.assign(data, createSeedData());
+        state.data = normalizeData(data);
+        persistLocalData();
+        return { ok: true, data: state.data };
+      }
+      if (action === "getAppData") return { ok: true, data };
+      if (action === "saveSupply") upsert(data.supplies, { ...payload, updatedAt: now }, "SUP");
+      if (action === "receiveSupply") {
+        const supply = data.supplies.find(item => item.id === payload.supplyId);
+        const receipt = upsert(data.receipts, { ...payload, supplyName: supply?.name || payload.supplyName, createdAt: now }, "REC");
+        if (supply) {
+          supply.quantity = Number(supply.quantity || 0) + Number(payload.quantity || 0);
+          supply.price = Number(payload.price || supply.price || 0);
+          supply.updatedAt = now;
+        }
+        data.movements.push({ id: makeId("MOV"), date: payload.date || today(), type: "IN", refId: receipt.id, supplyId: payload.supplyId, supplyName: supply?.name || payload.supplyName, quantity: Number(payload.quantity || 0), note: payload.docNo || "", createdAt: now });
+      }
+      if (action === "requestSupply") upsert(data.requisitions, { ...payload, status: "รออนุมัติ", createdAt: now }, "REQ");
+      if (action === "approveRequisition") {
+        const item = data.requisitions.find(row => row.id === payload.id);
+        if (item) Object.assign(item, { status: payload.approved ? "อนุมัติ" : "ไม่อนุมัติ", approver: payload.approver, approvedAt: now, rejectReason: payload.reason || "" });
+      }
+      if (action === "issueRequisition") {
+        const item = data.requisitions.find(row => row.id === payload.id);
+        const supply = data.supplies.find(row => row.id === item?.supplyId);
+        if (!item || !supply) throw new Error("ไม่พบรายการ");
+        if (Number(supply.quantity) < Number(item.quantity)) throw new Error("สต็อกไม่เพียงพอ");
+        supply.quantity = Number(supply.quantity) - Number(item.quantity);
+        Object.assign(item, { status: "จ่ายแล้ว", issuedBy: payload.issuer, issuedAt: now });
+        data.movements.push({ id: makeId("MOV"), date: today(), type: "OUT", refId: item.id, supplyId: supply.id, supplyName: supply.name, quantity: Number(item.quantity), note: item.reason || "", createdAt: now });
+      }
+      if (action === "saveAsset") upsert(data.assets, { ...payload, updatedAt: now }, "AST");
+      if (action === "saveRepair") {
+        const repair = upsert(data.repairs, { ...payload, updatedAt: now }, "REP");
+        const asset = data.assets.find(row => row.id === repair.assetId);
+        if (asset && ["รอรับเรื่อง", "กำลังซ่อม"].includes(repair.status)) asset.status = "รอซ่อม";
+        if (asset && repair.status === "ซ่อมเสร็จ") asset.status = "ใช้งาน";
+      }
+      if (action === "saveTransfer") {
+        upsert(data.transfers, { ...payload, createdAt: now }, "TRN");
+        const asset = data.assets.find(row => row.id === payload.assetId);
+        if (asset) Object.assign(asset, { location: payload.toLocation, responsible: payload.toResponsible, updatedAt: now });
+      }
+      if (action === "saveInventory") upsert(data.inventories, { ...payload, createdAt: now }, "INV");
+      if (action === "saveUser") {
+        const existing = payload.id ? data.users.find(row => row.id === payload.id) : null;
+        const duplicate = data.users.find(row => normalizeUsername(row.username) === normalizeUsername(payload.username) && row.id !== payload.id);
+        if (duplicate) throw new Error("User นี้มีอยู่แล้ว");
+        const nextUser = { ...payload, password: payload.password || existing?.password || "", updatedAt: now };
+        if (!nextUser.password) throw new Error("กรุณากำหนด Password");
+        upsert(data.users, nextUser, "USR");
+      }
+      if (action === "deleteRecord") {
+        const list = data[payload.collection];
+        if (Array.isArray(list)) {
+          const index = list.findIndex(row => row.id === payload.id);
+          if (index >= 0) list.splice(index, 1);
+        }
+      }
+      state.data = normalizeData(data);
+      persistLocalData();
+      return { ok: true, data: state.data };
+    }
+
+    function upsert(list, item, prefix) {
+      const clean = { ...item };
+      if (!clean.id) clean.id = makeId(prefix);
+      const index = list.findIndex(row => row.id === clean.id);
+      if (index >= 0) list[index] = { ...list[index], ...clean };
+      else list.unshift(clean);
+      return index >= 0 ? list[index] : list[0];
+    }
+
+    function openModal(title, html) {
+      document.getElementById("modalTitle").textContent = title;
+      document.getElementById("modalBody").innerHTML = html;
+      document.getElementById("modalBackdrop").classList.add("active");
+    }
+
+    function closeModal() {
+      document.getElementById("modalBackdrop").classList.remove("active");
+    }
+
+    function openLoginModal() {
+      openModal("เข้าสู่ระบบ", `
+        <form id="loginForm">
+          <div class="form-grid">
+            <div class="field span-6"><label>User</label><input name="username" autocomplete="username" required value="Boss"></div>
+            <div class="field span-6"><label>Password</label><input name="password" type="password" autocomplete="current-password" required></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn" type="submit">เข้าสู่ระบบ</button>
+          </div>
+        </form>
+      `);
+      document.getElementById("loginForm").addEventListener("submit", async event => {
+        event.preventDefault();
+        const payload = await formToObject(event.target);
+        try {
+          let result;
+          try {
+            result = await api("loginUser", payload);
+          } catch (serverError) {
+            result = localRun("loginUser", payload);
+          }
+          if (!result || !result.user) throw new Error("User หรือ Password ไม่ถูกต้อง");
+          state.authUser = result.user;
+          if (result.data) state.data = normalizeData(result.data);
+          ensureDefaultUsers();
+          state.selectedUser = state.authUser.id;
+          sessionStorage.setItem(APP_CONFIG.AUTH_STORAGE_KEY, JSON.stringify(state.authUser));
+          closeModal();
+          setPage("dashboard");
+          toast("เข้าสู่ระบบสำเร็จ");
+        } catch (error) {
+          toast(error.message || "เข้าสู่ระบบไม่สำเร็จ");
+        }
+      });
+    }
+
+    function logout() {
+      state.authUser = null;
+      state.selectedUser = "";
+      state.page = "dashboard";
+      sessionStorage.removeItem(APP_CONFIG.AUTH_STORAGE_KEY);
+      renderAll();
+      toast("ออกจากระบบแล้ว");
+    }
+
+    function isLoggedIn() {
+      return !!state.authUser;
+    }
+
+    function isAdmin() {
+      return state.authUser?.role === "ผู้ดูแลระบบ";
+    }
+
+    function readAuthSession() {
+      try {
+        return JSON.parse(sessionStorage.getItem(APP_CONFIG.AUTH_STORAGE_KEY) || "null");
+      } catch {
+        return null;
+      }
+    }
+
+    function toolbar(id, placeholder) {
+      return `
+        <div class="toolbar">
+          <div class="searchbar">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></svg>
+            <input id="${id}" placeholder="${placeholder}" value="${escapeAttr(sessionStorage.getItem(id) || "")}">
+          </div>
+        </div>
+      `;
+    }
+
+    function bindSearch(id, renderFn) {
+      const input = document.getElementById(id);
+      if (!input) return;
+      input.addEventListener("input", debounce(() => {
+        sessionStorage.setItem(id, input.value);
+        renderFn();
+      }, 160));
+    }
+
+    function filterRows(rows, searchId, keys) {
+      const keyword = (sessionStorage.getItem(searchId) || "").trim().toLowerCase();
+      const sorted = [...rows].sort((a, b) => String(b.createdAt || b.updatedAt || b.date || "").localeCompare(String(a.createdAt || a.updatedAt || a.date || "")));
+      if (!keyword) return sorted;
+      return sorted.filter(row => keys.some(key => String(row[key] || "").toLowerCase().includes(keyword)));
+    }
+
+    function supplySelect(name, allowCreate) {
+      const options = state.data.supplies.map(item => `<option value="${item.id}">${escapeHtml(item.code)} - ${escapeHtml(item.name)} (${formatNumber(item.quantity)} ${escapeHtml(item.unit)})</option>`).join("");
+      return `<select name="${name}" required><option value="">เลือกรายการ</option>${options}</select>${allowCreate ? '<div class="hint">หากยังไม่มีรายการ ให้เพิ่มในเมนูทะเบียนพัสดุก่อน</div>' : ""}`;
+    }
+
+    function assetSelect(name) {
+      const options = state.data.assets.map(item => `<option value="${item.id}">${escapeHtml(item.assetNo)} - ${escapeHtml(item.name)}</option>`).join("");
+      return `<select name="${name}" required><option value="">เลือกครุภัณฑ์</option>${options}</select>`;
+    }
+
+    function select(name, items, current = "") {
+      return `<select name="${name}">${items.map(item => `<option value="${escapeAttr(item)}" ${item === current ? "selected" : ""}>${escapeHtml(item)}</option>`).join("")}</select>`;
+    }
+
+    async function formToObject(form, includeFiles = false) {
+      const object = {};
+      const formData = new FormData(form);
+      for (const [key, value] of formData.entries()) {
+        if (value instanceof File) {
+          object[key] = value.name || "";
+          if (includeFiles && value.name && value.size <= 250000) {
+            object[`${key}DataUrl`] = await fileToDataUrl(value);
+          }
+        } else {
+          object[key] = value;
+        }
+      }
+      return object;
+    }
+
+    function fileToDataUrl(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function saveGasUrl() {
+      state.gasUrl = document.getElementById("gasUrlInput").value.trim();
+      localStorage.setItem("gasWebAppUrl", state.gasUrl);
+      toast("บันทึก URL แล้ว");
+      loadFromServer(true);
+    }
+
+    function resetDemoData() {
+      if (!confirm("ล้างข้อมูลในเครื่องและเริ่มต้นระบบว่าง")) return;
+      localStorage.removeItem(APP_CONFIG.LOCAL_STORAGE_KEY);
+      state.data = createSeedData();
+      persistLocalData();
+      renderAll();
+      toast("ล้างข้อมูลในเครื่องแล้ว");
+    }
+
+    function exportCsv(collection, rowsOverride) {
+      const rows = rowsOverride || state.data[collection] || [];
+      if (!rows.length) return toast("ไม่มีข้อมูลสำหรับส่งออก");
+      const keys = Object.keys(rows[0]).filter(key => !key.endsWith("DataUrl") && key !== "password");
+      const csv = "\ufeff" + [keys.join(","), ...rows.map(row => keys.map(key => csvCell(row[key])).join(","))].join("\n");
+      downloadText(`${collection}_${today()}.csv`, csv, "text/csv;charset=utf-8");
+    }
+
+    function exportReportCsv(collection) {
+      exportCsv(collection, getReportRows(collection));
+    }
+
+    function exportFilteredCsv() {
+      ["supplies", "receipts", "requisitions", "assets", "repairs", "transfers", "inventories", "users"].forEach(collection => {
+        exportCsv(collection, getReportRows(collection));
+      });
+    }
+
+    function exportAllCsv() {
+      ["supplies", "receipts", "requisitions", "assets", "repairs", "transfers", "inventories", "users"].forEach(exportCsv);
+    }
+
+    function downloadText(filename, text, mime) {
+      const blob = new Blob([text], { type: mime });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function csvCell(value) {
+      const text = String(value ?? "").replace(/"/g, '""');
+      return /[",\n]/.test(text) ? `"${text}"` : text;
+    }
+
+    function getDashboard() {
+      return {
+        totalSupplies: state.data.supplies.length,
+        lowSupplies: state.data.supplies.filter(item => Number(item.quantity) <= Number(item.minQty)).length,
+        totalAssets: state.data.assets.length,
+        brokenAssets: state.data.assets.filter(item => ["ชำรุด", "รอซ่อม", "รอจำหน่าย", "จำหน่าย/ใช้งานไม่ได้"].includes(item.status)).length,
+        pendingRequests: state.data.requisitions.filter(item => item.status === "รออนุมัติ").length,
+        assetValue: state.data.assets.reduce((sum, item) => sum + Number(item.price || 0), 0)
+      };
+    }
+
+    function renderMonthlyChart() {
+      const months = last12Months();
+      const totals = months.map(month => {
+        return state.data.requisitions
+          .filter(item => item.status === "จ่ายแล้ว" && String(item.issuedAt || item.date || "").slice(0, 7) === month.key)
+          .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+      });
+      const max = Math.max(1, ...totals);
+      return `
+        <div class="chart">
+          ${months.map((month, index) => `
+            <div class="bar" title="${month.label}: ${totals[index]}">
+              <span style="height:${Math.max(3, (totals[index] / max) * 190)}px"></span>
+              <small>${month.short}</small>
+            </div>
+          `).join("")}
+        </div>
+      `;
+    }
+
+    function renderAssetDonut() {
+      const statuses = ["ใช้งาน", "รอซ่อม", "ชำรุด", "รอจำหน่าย"];
+      const colors = ["#0f8f8c", "#2563eb", "#b7791f", "#d64545"];
+      const counts = statuses.map(status => state.data.assets.filter(item => item.status === status).length);
+      const total = Math.max(1, counts.reduce((a, b) => a + b, 0));
+      let start = 0;
+      const parts = counts.map((count, index) => {
+        const end = start + (count / total) * 100;
+        const part = `${colors[index]} ${start}% ${end}%`;
+        start = end;
+        return part;
+      });
+      return `
+        <div class="donut-row">
+          <div class="donut" style="background:conic-gradient(${parts.join(",")})"></div>
+          <div class="legend">
+            ${statuses.map((status, index) => `
+              <div class="legend-item"><span><span class="legend-color" style="background:${colors[index]}"></span>${status}</span><strong>${counts[index]}</strong></div>
+            `).join("")}
+          </div>
+        </div>
+      `;
+    }
+
+    function alertTable(title, rows) {
+      return `
+        <div style="margin-bottom:14px">
+          <h4 style="margin:0 0 8px">${title}</h4>
+          ${rows.length ? `
+            <div class="table-wrap">
+              <table style="min-width:560px"><tbody>${rows.slice(0, 5).map(row => `<tr>${row.map(cell => `<td>${escapeHtml(cell ?? "-")}</td>`).join("")}</tr>`).join("")}</tbody></table>
+            </div>
+          ` : `<div class="empty">ไม่มีรายการ</div>`}
+        </div>
+      `;
+    }
+
+    function activityList() {
+      const items = [
+        ...state.data.receipts.map(item => ({ date: item.createdAt || item.date, text: `รับเข้า ${item.supplyName} จำนวน ${item.quantity}` })),
+        ...state.data.requisitions.map(item => ({ date: item.issuedAt || item.approvedAt || item.createdAt || item.date, text: `${item.status} ${item.supplyName} จำนวน ${item.quantity}` })),
+        ...state.data.repairs.map(item => ({ date: item.updatedAt || item.date, text: `${item.status} ${item.assetName}` })),
+        ...state.data.inventories.map(item => ({ date: item.createdAt || item.date, text: `ตรวจนับ ${item.assetName}: ${item.status}` }))
+      ].sort((a, b) => String(b.date).localeCompare(String(a.date))).slice(0, 8);
+      if (!items.length) return empty("ยังไม่มีกิจกรรม");
+      return items.map(item => `<div style="padding:10px 0;border-bottom:1px solid var(--line)"><strong>${escapeHtml(item.text)}</strong><br><span class="hint">${formatDateTime(item.date)}</span></div>`).join("");
+    }
+
+    function updateBadges() {
+      const badge = document.getElementById("pendingBadge");
+      if (badge) badge.textContent = state.data.requisitions.filter(item => item.status === "รออนุมัติ").length;
+    }
+
+    function stockStatus(item) {
+      return Number(item.quantity) <= Number(item.minQty) ? '<span class="status warn">ใกล้หมด</span>' : '<span class="status ok">ปกติ</span>';
+    }
+
+    function requestStatus(status) {
+      const cls = status === "จ่ายแล้ว" ? "ok" : status === "ไม่อนุมัติ" ? "danger" : status === "รออนุมัติ" ? "warn" : "";
+      return `<span class="status ${cls}">${escapeHtml(status || "-")}</span>`;
+    }
+
+    function assetStatus(status) {
+      const cls = ["ชำรุด", "รอซ่อม", "จำหน่าย/ใช้งานไม่ได้", "ปิดใช้งาน"].includes(status) ? "danger" : ["รอจำหน่าย"].includes(status) ? "warn" : "ok";
+      return `<span class="status ${cls}">${escapeHtml(status || "-")}</span>`;
+    }
+
+    function repairStatus(status) {
+      const cls = status === "ซ่อมเสร็จ" ? "ok" : status === "กำลังซ่อม" ? "warn" : status === "จำหน่าย/ใช้งานไม่ได้" ? "danger" : "";
+      return `<span class="status ${cls}">${escapeHtml(status || "-")}</span>`;
+    }
+
+    function inventoryStatus(status) {
+      const cls = status === "พบ" ? "ok" : status === "ไม่พบ" || status === "ชำรุด" ? "danger" : "warn";
+      return `<span class="status ${cls}">${escapeHtml(status || "-")}</span>`;
+    }
+
+    function qrCanvas(text) {
+      const bits = Array.from(String(text)).reduce((sum, char) => sum + char.charCodeAt(0), 0);
+      const cells = Array.from({ length: 49 }, (_, index) => ((bits + index * 13 + Math.floor(index / 3)) % 5) < 2);
+      return `
+        <div class="qr-box" title="${escapeAttr(text)}">
+          <svg viewBox="0 0 70 70" width="90" height="90" aria-label="QR ${escapeAttr(text)}">
+            <rect width="70" height="70" fill="#fff"></rect>
+            ${finder(4, 4)}${finder(46, 4)}${finder(4, 46)}
+            ${cells.map((on, index) => on ? `<rect x="${14 + (index % 7) * 6}" y="${14 + Math.floor(index / 7) * 6}" width="5" height="5" fill="#122c32"></rect>` : "").join("")}
+          </svg>
+        </div>
+      `;
+    }
+
+    function finder(x, y) {
+      return `<rect x="${x}" y="${y}" width="20" height="20" fill="#122c32"></rect><rect x="${x + 4}" y="${y + 4}" width="12" height="12" fill="#fff"></rect><rect x="${x + 8}" y="${y + 8}" width="4" height="4" fill="#122c32"></rect>`;
+    }
+
+    function createSeedData() {
+      return normalizeData({
+        users: [
+          defaultBossUser()
+        ],
+        supplies: [],
+        receipts: [],
+        requisitions: [],
+        assets: [],
+        repairs: [],
+        transfers: [],
+        inventories: [],
+        movements: []
+      });
+    }
+
+    function normalizeData(data) {
+      const keys = ["users", "supplies", "receipts", "requisitions", "assets", "repairs", "transfers", "inventories", "movements"];
+      keys.forEach(key => {
+        if (!Array.isArray(data[key])) data[key] = [];
+      });
+      data.users.forEach(user => {
+        user.role = normalizeUserRole(user.role);
+        user.position = normalizeUserRole(user.position);
+      });
+      return data;
+    }
+
+    function ensureDefaultUsers() {
+      const boss = defaultBossUser();
+      const existing = state.data.users.find(user => normalizeUsername(user.username) === "boss" || user.id === boss.id);
+      if (existing) {
+        existing.username = existing.username || boss.username;
+        existing.password = existing.password || boss.password;
+        existing.role = "ผู้ดูแลระบบ";
+        existing.active = "Y";
+      } else {
+        state.data.users.unshift(boss);
+      }
+      persistLocalData();
+    }
+
+    function defaultBossUser() {
+      return {
+        id: "USR-BOSS",
+        name: "Boss",
+        username: "Boss",
+        password: "05446",
+        position: "ผู้ดูแลระบบ",
+        department: "รพ.สต.บ้านทับสอ",
+        role: "ผู้ดูแลระบบ",
+        active: "Y",
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function sanitizeAuthUser(user) {
+      return {
+        id: user.id,
+        name: user.name,
+        username: user.username,
+        position: normalizeUserRole(user.position),
+        department: user.department,
+        role: normalizeUserRole(user.role),
+        active: user.active
+      };
+    }
+
+    function normalizeUsername(value) {
+      return String(value || "").replace(/^\u0E3A+/, "").trim().toLowerCase();
+    }
+
+    function normalizeUserRole(value) {
+      const text = String(value || "").trim();
+      if (text === "หัวหน้า รพ.สต." || text === "หัวหน้ารพ.สต." || text === "หัวหน้า รพ.สต") return "ผอ.รพ.สต.บ้านทับสอ";
+      return text;
+    }
+
+    function readLocalData() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(APP_CONFIG.LOCAL_STORAGE_KEY) || "null");
+        return saved ? normalizeData(saved) : createSeedData();
+      } catch {
+        return createSeedData();
+      }
+    }
+
+    function persistLocalData() {
+      localStorage.setItem(APP_CONFIG.LOCAL_STORAGE_KEY, JSON.stringify(state.data));
+    }
+
+    function currentUser() {
+      if (state.authUser) {
+        return state.data.users.find(user => user.id === state.authUser.id || user.username === state.authUser.username) || state.authUser;
+      }
+      return state.data.users.find(user => user.id === state.selectedUser) || state.data.users[0];
+    }
+
+    function currentMonthIssued() {
+      const key = new Date().toISOString().slice(0, 7);
+      return state.data.requisitions
+        .filter(item => item.status === "จ่ายแล้ว" && String(item.issuedAt || item.date || "").slice(0, 7) === key)
+        .reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    }
+
+    function stockValue() {
+      return state.data.supplies.reduce((sum, item) => sum + Number(item.quantity || 0) * Number(item.price || 0), 0);
+    }
+
+    function uniqueCount(rows, key) {
+      return new Set(rows.map(row => row[key]).filter(Boolean)).size;
+    }
+
+    function last12Months() {
+      const result = [];
+      const now = new Date();
+      for (let i = 11; i >= 0; i -= 1) {
+        const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        result.push({
+          key: `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`,
+          label: `${TH_MONTHS[date.getMonth()]} ${date.getFullYear() + 543}`,
+          short: TH_MONTHS[date.getMonth()]
+        });
+      }
+      return result;
+    }
+
+    function makeId(prefix) {
+      return `${prefix}-${Date.now().toString(36).toUpperCase()}${Math.random().toString(36).slice(2, 5).toUpperCase()}`;
+    }
+
+    function today() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function formatDate(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return escapeHtml(value);
+      return date.toLocaleDateString("th-TH", { year: "numeric", month: "short", day: "numeric" });
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "-";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return escapeHtml(value);
+      return date.toLocaleString("th-TH", { dateStyle: "medium", timeStyle: "short" });
+    }
+
+    function formatNumber(value) {
+      return Number(value || 0).toLocaleString("th-TH");
+    }
+
+    function formatMoney(value) {
+      return Number(value || 0).toLocaleString("th-TH", { maximumFractionDigits: 2 });
+    }
+
+    function empty(text) {
+      return `<div class="empty">${escapeHtml(text)}</div>`;
+    }
+
+    function toast(message) {
+      const host = document.getElementById("toast");
+      const item = document.createElement("div");
+      item.className = "toast-item";
+      item.textContent = message;
+      host.appendChild(item);
+      setTimeout(() => item.remove(), 3200);
+    }
+
+    function debounce(fn, wait) {
+      let timer;
+      return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), wait);
+      };
+    }
+
+    function structuredCloneSafe(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    function escapeAttr(value) {
+      return escapeHtml(value);
+    }
+  </script>
+</body>
+</html>
